@@ -1,22 +1,26 @@
 
 REQUIREMENTS:
 
-Create a password strength widget that could be used in multiple forms. The widget should do the following:
+Create a password strength widget that could be used in multiple forms. The widget should fulfill the following requirements:
 (1) Follow best practices for determining password strength.
 (2) Allow any number of strength ranges (ex. "weak", "good", "excellent", etc...) to be defined for each password field.
-(3) Be independant of page's HTML structure so the functionality can be used for any number of different login forms.
+(3) Be independent of page's HTML structure so the functionality can be used for any number of different login forms.
 
 DISCUSSION:
 
-The definitive research on calculating password strength has been conducted by the National Institute of Standards and Technology (NIST) and documented in their "Electronic Authentication Guideline" (http://csrc.nist.gov/publications/nistpubs/800-63-1/SP-800-63-1.pdf). The NISTs recomendations for password strength calculations are located in Appendix A of the aforementioned document. The NIST defines a password's strenght in terms of "entrophy". Entrophy is simply how random the characters in the password are. A password composed of more random characters will have a higher entrophy value. For requirement #1 I used the entrophy calculations defined in the Electronic Authentication Guideline for determining a password's entrophy.
+The definitive research on calculating password strength has been conducted by the National Institute of Standards and Technology (NIST) and documented in their "Electronic Authentication Guideline" (http://csrc.nist.gov/publications/nistpubs/800-63-1/SP-800-63-1.pdf). The NIST's recommendations for password strength calculations are located in Appendix A of the aforementioned document. The NIST defines a password's strength in terms of "entropy". Entropy is simply how random the characters in the password are. A password composed of more random characters will have a higher entropy value. For requirement #1 I used the entropy calculations defined in the Electronic Authentication Guideline for determining a password's entropy.
 
- The Electronic Authentication Guideline provides a detailed description of how to calculate entrophy, but for the sake of brevity, here an over-simplified explanation on how it works:
+ The Electronic Authentication Guideline provides a detailed description of how to calculate entropy, but for the sake of brevity, here a simplified explanation on how it works:
 
-    (1) Determine how many character sets the password is in. For example "test1234-=" contains characters from three character sets: lowercase characters ("test"), numeric ("1234"), and special characters ("-=").
-    (2) Calculate initial entrophy value based on size of the character sets the password is in, the number of character sets the password is in, and the length of password.
-    (3) Add bonus entrophy for passwords that pass a dictionary test.
+    (1) Determine how many character sets the password is in. For example "test1234-=" contains three character sets: lowercase characters ("test"), numeric ("1234"), and special characters ("-=").
+    (2) Calculate initial entropy value based on size of the character sets the password is in, the number of character sets the password is in, and the length of password.
+    (3) Add bonus entropy for passwords that pass a dictionary test.
 
-How much entrophy does a "strong" or "weak" password have? That answer is completely subjective. For that reason, and to fulfill requirement #2, the password strenght meter accepts a range of entrophy values to define what constitutes weak or strong passwords. There is no restriction on how many entrophy ranges can be specified.
+How much entropy does a "strong" or "weak" password have? That answer is subjective. For that reason, and to fulfill requirement #2, the password strength meter accepts a range of entropy values to define what constitutes weak or strong passwords.
+
+
+
+DEVELOPER API
 
 
 

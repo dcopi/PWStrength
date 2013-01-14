@@ -91,28 +91,28 @@ PWStrengthMeter.prototype = {
 
 
     checkField: function () {
-        var entrophyObj;
+        var entropyObj;
 
         // check if the password changed before proceeding
         if (this.fieldEl.value !== this.password) {
             // password has changed
             this.password = this.fieldEl.value;
-            entrophyObj = new Entrophy(this.password);
-            this.notify(entrophyObj);
+            entropyObj = new Entropy(this.password);
+            this.notify(entropyObj);
         };
     },
 
 
     /*
      * Callback function for whatever method we called to calculate the strength
-     * of the password. Currently, we are using the Entrophy Class to calculate
+     * of the password. Currently, we are using the Entropy Class to calculate
      * the bit strength of the given password.
      * @param info {Object} Data about the given password. Example Object would be:
      *          {
      *              password: "test",
      *              length: 4,
      *              bits: .224208765,
-     *              entrophy: 22.4,
+     *              entropy: 22.4,
      *              inDict: true,
      *              charset: { size: 128, count: 3 }
      *          }
@@ -125,7 +125,7 @@ PWStrengthMeter.prototype = {
             rl,
             range,
             pw = info.password,
-            entrophy = info.entrophy,
+            entropy = info.entropy,
             cancelCSS = false,
             mel = this.meterEl,
             cls;
@@ -149,7 +149,7 @@ PWStrengthMeter.prototype = {
         // Determine what "ranges" the password is based on it's bit value
         for (i=0; i<this.ranges.length; ++i) {
             range = this.ranges[i];
-            if (entrophy >= range.min && entrophy <= range.max) {
+            if (entropy >= range.min && entropy <= range.max) {
                 data.range = range;
                 break;
             }
