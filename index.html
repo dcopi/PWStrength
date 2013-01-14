@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+        <title>Test PWInfo JS</title>
+
+        <script language="javascript" src="pwinfo.js"></script>
+        <script language="javascript" src="pwstrengthmeter.js"></script>
+
+        <script>
+        window.onload = function () {
+
+            var fld = document.forms["test"].elements["pw"],
+                meter = document.getElementById("meter");
+
+
+            new PWStrengthMeter(fld, meter, {
+                rules: [
+                    {regex: /.{8,}/, result: true }   // length >= 8
+                   // Examples
+                   // ,{regex: /[a-z]/i, result: true }  // Must contain at least one alpha character
+                   // ,{regex: /[\W_]/, result: true }   // Must contain one symbol
+                   // ,{regex: /^\d/, result: false }   // Cannot start with a number
+                ]
+            });
+        };
+        </script>
+
+        <style>
+        .passwordWrap {
+            width: 520px;
+        }
+
+        input.password {
+            width: 200px;
+            float: left;
+        }
+
+        /* this is the element whose CSS classnames will be updated as the password
+         * strength changes.
+         */
+        .meter {
+            width: 310px;
+            float: right;
+            font-family: Verdana, Arial, Helvetica, Verdana, sans-serif;
+            font-size: 11px;
+            color: #999;
+        }
+
+        /* Hide|show text */
+        .msgWeak, .msgGood, .msgStrong { display: none; }
+        .valid .msgInvalid { display: none; }
+        .valid.weak .msgWeak, .valid.good .msgGood, .valid.strong .msgStrong { display: inline; }
+
+        .barWrap {
+            width: 150px;
+            height: 5px;
+            background-color: #F5F5F5;
+            border: 1px solid #ccc;
+        }
+
+        /* The bar that shows the password strength */
+        .bar {
+            height: 5px;
+            display: none;
+
+            transition: background-color .3s;
+            -moz-transition: background-color .3s;
+            -webkit-transition: background-color .3s;
+            -o-transition: background-color .3s;
+
+            transition: width .3s linear;
+            -moz-transition: width .3s linear;
+            -webkit-transition: width .3s linear;
+            -o-transition: width .3s linear;
+        }
+        .valid .bar { display: block; }
+
+        .weak .bar { width: 50px; background-color: #891B28; }
+        .good .bar { width: 100px; background-color: #F4C43C; }
+        .strong .bar { width: 150px; background-color: #037100; }
+
+        </style>
+    </head>
+    <body>
+
+        <form name="test">
+            <div class="passwordWrap">
+                <input type="text" name="pw" class="password" />
+                <div id="meter" class="meter invalid">
+                    <span class="msgInvalid">Passwords must be at least 8 characters long</span>
+                    <span class="msgWeak">Weak</span>
+                    <span class="msgGood">Good</span>
+                    <span class="msgStrong">Strong</span>
+
+                    <div class="barWrap">
+                        <div class="bar"></div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+    </body>
+</html>
