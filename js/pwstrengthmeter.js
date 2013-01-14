@@ -57,7 +57,6 @@ var PWStrengthMeter = function (fieldEl, meterEl, opts) {
     }
 
     // Add onkeyup listener to password field
-    //var fn = this.bind(this.checkField, this);
     var fn = this.checkField.curry(this);
     if (fieldEl.addEventListener) {
         fieldEl.addEventListener('keyup', fn, false);
@@ -78,7 +77,8 @@ PWStrengthMeter.prototype = {
 
     // opts
     ranges: [
-        { min: Number.NEGATIVE_INFINITY, max: 56, cls: "weak"},
+        { min: Number.NEGATIVE_INFINITY, max: 0, cls: "empty"},
+        { min: 0, max: 56, cls: "weak"},
         { min: 56, max: 80, cls: "good" },
         { min: 80, max: Number.POSITIVE_INFINITY, cls: "strong" }
     ],

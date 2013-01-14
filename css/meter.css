@@ -1,0 +1,61 @@
+ .passwordWrap {
+    width: 520px;
+}
+
+input.password {
+    width: 200px;
+    float: left;
+}
+
+/* this is the element whose CSS classnames will be updated as the password
+ * strength changes.
+ */
+.meter {
+    width: 310px;
+    float: right;
+    font-family: Verdana, Arial, Helvetica, Verdana, sans-serif;
+    font-size: 11px;
+    color: #999;
+}
+
+/* Hide|show text */
+.msgEmpty, .msgWeak, .msgGood, .msgStrong { display: none; }
+.valid .msgInvalid { display: none; }
+.valid.empty .msgEmpty, .valid.weak .msgWeak, .valid.good .msgGood, .valid.strong .msgStrong { display: inline; }
+
+.barWrap {
+    width: 150px;
+    height: 5px;
+    background-color: #F5F5F5;
+    border: 1px solid #ccc;
+}
+
+/* The bar that shows the password strength */
+.bar {
+    height: 5px;
+    display: none;
+
+    transition: background-color .3s;
+    -moz-transition: background-color .3s;
+    -webkit-transition: background-color .3s;
+    -o-transition: background-color .3s;
+
+    transition: width .3s linear;
+    -moz-transition: width .3s linear;
+    -webkit-transition: width .3s linear;
+    -o-transition: width .3s linear;
+}
+.valid .bar { display: block; }
+
+.empty .bar { width: 0px; background-color: transparent; }
+.weak .bar { width: 50px; background-color: #891B28; }
+.good .bar { width: 100px; background-color: #F4C43C; }
+.strong .bar { width: 150px; background-color: #037100; }
+
+
+
+
+
+
+
+
