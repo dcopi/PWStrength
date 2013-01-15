@@ -1,30 +1,45 @@
 body {
-    padding: 20px;
+    line-height: 1.5em;
+    margin-bottom: 60px;
 }
 
 body, button, input, textarea, select {
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
     font-family: Arial;
-    font-size: 100%;
+    font-size: 90%;
     color: #202020;
 }
 
+.main {
+    width: 960px;
+    margin: 0px auto;
+}
+
+h1, h2 {
+    border-bottom: 1px solid #aaa;
+    line-height: 1.2em;
+}
 
 dt {
     font-weight: bold;
 }
 
 li {
-    margin-top: .5em;
+    line-height: 1.2em;
     margin-bottom: .5em;
+}
+
+ul ul {
+    margin-top: .5em;
 }
 
 pre {
     margin-left: 1em;
-    border: 1px solid black;
+    margin-right: 2em;
     padding: 5px;
-    background-color: #eee;
+    background: #f9f9f9;
+    border: 1px solid #aaa;
 }
 
 .code {
@@ -34,9 +49,29 @@ pre {
 }
 
 
+.clr {
+    clear: both;
+}
 
 
+.navigation {
+    float: right;
+    width: 250px;
+    background: #f9f9f9;
+    border: 1px solid #aaa;
+    margin-left: 1.2em;
+    margin-bottom: 1.2em;
+}
 
+.navHead {
+    text-align: center;
+    font-weight: bold;
+}
 
+.classDeclaration {
+    font-size: 150%;
+}
 
-
+li form {
+    padding-top: .5em;
+}

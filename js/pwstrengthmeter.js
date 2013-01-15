@@ -11,6 +11,9 @@
  *          cancel the setting of classNames on the meterEl. The function will be passed an object with the
  *          following attributes:
  *          {
+ *              password: < The user's password >,
+ *              inDict: < Boolean indicating whether the password matches a dictionary entry >,
+ *              entropy: < The entropy value of the password >,
  *              valid: < Boolean indicating whether the password passed all of the rules >,
  *              range:  < Object of range that the password matched >,
  *              invalidRules: < Array of the rules that failed to validate. Empty if valid is true >
@@ -21,7 +24,8 @@
  *          The cls attribute will be applied to the meterEl whenever the rule matches the calculated bitRange.
  *          The default ranges are:
  *          [
- *              { min: Number.NEGATIVE_INFINITY, max: 56, cls: "weak"},
+ *              { min: Number.NEGATIVE_INFINITY, max: 0, cls: "empty"},
+ *              { min: 0, max: 56, cls: "weak"},
  *              { min: 56, max: 80, cls: "good" },
  *              { min: 80, max: Number.POSITIVE_INFINITY, cls: "strong" }
  *          ]
@@ -117,15 +121,22 @@ PWStrengthMeter.prototype = {
      *              charset: { size: 128, count: 3 }
      *          }
      *
-     * @return data {Object} Data associated with the password: validity, rules broken, ranges.
+     * @return data {Object} Data associated with the password: entropy, inDict, validity, rules broken, ranges.
      */
     notify: function (info) {
-        var data = {valid:true, invalidRules:[], range:null},
+        var pw = info.password,
+            entropy = info.entropy,
+            data = {
+                password: pw,
+                entropy: entropy,
+                inDict: info.inDict,
+                valid: true,
+                invalidRules: [],
+                range: null
+            },
             i,
             rl,
             range,
-            pw = info.password,
-            entropy = info.entropy,
             cancelCSS = false,
             mel = this.meterEl,
             cls;
@@ -256,6 +267,7 @@ if(!Function.prototype.curry) {
                 fn = this;
 
             return function ( ) {
+                // pre-pend any arguments that have been passed in before executing the function
                 fn.apply(scope||this, slice.call(arguments).concat(args));
             };
         } // -- eo curry method

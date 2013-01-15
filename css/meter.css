@@ -1,41 +1,5 @@
-body {
-    padding: 20px;
-}
-
-body, button, input, textarea, select {
-    -webkit-font-smoothing: antialiased;
-    text-rendering: optimizeLegibility;
-    font-family: Arial;
-    font-size: 100%;
-    color: #202020;
-}
-
-
-dt {
-    font-weight: bold;
-}
-
-li {
-    margin-top: .5em;
-    margin-bottom: .5em;
-}
-
-pre {
-    margin-left: 1em;
-    border: 1px solid black;
-    padding: 5px;
-    background-color: #eee;
-}
-
-.code {
-    font-family: monospace;
-    font-weight: bold;
-    font-size: 1.2em;
-}
-
-
 .passwordWrap {
-    width: 520px;
+    width: 720px;
 }
 
 input.password {
@@ -47,7 +11,7 @@ input.password {
  * strength changes.
  */
 .meter {
-    width: 310px;
+    width: 500px;
     float: right;
     font-family: Verdana, Arial, Helvetica, Verdana, sans-serif;
     font-size: 11px;
@@ -96,4 +60,22 @@ input.password {
 
 
 
+/* styles for example #4 */
+.valid .msgNotInDict {
+    display: block;
+    color: #037100;
+    font-weight: bold;
+}
 
+.empty .msgInDict,
+.empty .msgNotInDict,
+.inDict .msgNotInDict,
+.valid .msgInDict {
+    display: none;
+}
+
+.inDict .valid .msgInDict {
+    display: block;
+    color: #891B28;
+    font-weight: bold;
+}
