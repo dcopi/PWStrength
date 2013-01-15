@@ -2,246 +2,245 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-        <title>Password Strength Meter Example</title>
-        <link rel="stylesheet" href="css/base.css" type="text/css" />
-        <link rel="stylesheet" href="css/meter.css" type="text/css" />
-        <script language="javascript" src="js/entropy.js"></script>
-        <script language="javascript" src="js/pwstrengthmeter.js"></script>
-        <script>
-        if (!window.addEventListener) {
-            window.addEventListener = function (type, fn) { window.attachEvent("on"+type, fn); };
-        }
-        </script>
-    </head>
-    <body>
+    <title>Password Strength Meter Example</title>
+    <link rel="stylesheet" href="css/base.css" type="text/css" />
+    <link rel="stylesheet" href="css/meter.css" type="text/css" />
+    <script language="javascript" src="js/entropy.js"></script>
+    <script language="javascript" src="js/pwstrengthmeter.js"></script>
+    <script>
+    if (!window.addEventListener) {
+        window.addEventListener = function (type, fn) { window.attachEvent("on"+type, fn); };
+    }
+    </script>
+</head>
+<body>
+
+<div class="main">
+    <h2>REQUIREMENTS</h2>
+    <p>
+    Create a password strength widget that could be used in multiple forms. The widget should fulfill the following requirements:
+        <ol>
+            <li>Follow best practices for determining password strength.</li>
+            <li>Allow any number of strength ranges (ex. "weak", "good", "excellent", etc...) to be defined for each password field.</li>
+            <li>Be independent of page's HTML structure so the functionality can be used for any number of different login forms.</li>
+            <li>Have no dependency on an external JavaScript library.</li>
+            <li>Allow user to specify password rules that must be passed before a password's strength will be calculated.</li>
+        </ol>
+    </p>
+
+    <h2>DISCUSSION</h2>
+    <p>
+    The definitive research on calculating password strength has been conducted by the National Institute of Standards and Technology (NIST) and documented in the <em>"Electronic Authentication Guideline"</em> (<a href="http://csrc.nist.gov/publications/nistpubs/800-63-1/SP-800-63-1.pdf">http://csrc.nist.gov/publications/nistpubs/800-63-1/SP-800-63-1.pdf</a>). The NIST's recommendations for password strength calculations are located in Appendix A. The NIST defines a password's strength in terms of "entropy". Entropy is simply how random the characters in the password are. A password composed of more random characters will have a higher entropy value. For requirement #1 I used the entropy calculations defined in the Electronic Authentication Guideline for determining a password's entropy.
+    </p>
+
+    <p>
+     The Electronic Authentication Guideline provides a detailed description of how to calculate entropy, but for the sake of brevity, here is a simplified explanation on how it works:
+
+        <ol>
+            <li>Determine how many character sets the password contains. For example <em>"test1234-="</em> contains three character sets: lowercase characters (<em>"test"</em>), numeric (<em>"1234"</em>), and special characters (<em>"-="</em>).</li>
+            <li>Calculate initial entropy value based on size of the character sets the password is in, the number of character sets the password is in, and the length of password.</li>
+            <li>Add bonus entropy for passwords that pass a dictionary test.</li>
+        </ol>
+    </p>
+
+    <p>
+    How much entropy does a "strong" or "weak" password have? That answer is subjective. For that reason, and to fulfill requirement #2, the password strength meter accepts an optional range of entropy values to define what constitutes weak or strong passwords. If no range is specified, a default is provided.
+    </p>
+
+    <p>
+    To fulfill requirement #3, to make the password strength meter flexible enough to be used on any form, the password strength meter does not impose an HTML structure. Because of this, the API will need three pieces of information:
+        <ol>
+            <li>A reference to the <span class="code">&lt;input&gt;</span> field used for the password.</li>
+            <li>A reference to the meter element (ex. a <span class="code">&lt;div&gt;</span> that will expand and collapse as the password strength increases and decreases).</li>
+            <li>A CSS classname for each entropy range. The classname will be added to the meter element whenever the entropy of the password matches the given range.</li>
+        </ol>
+    </p>
+
+    <p>
+    Finally, there are typically rules that must be passed before the password's strength becomes relevant. For example, the user may be required to have a password that is 8 or more characters in length before the strength meter is shown. To fulfill requirement #5 the password strength meter accepts a collection of regular expressions that will be tested against the current password to determine whether it is valid. The meter element will be given a classname of <em>"valid"</em> when all of the rules pass and a classname of <em>"invalid"</em> when any of the rules fail.
+    </p>
+
+    <h2>API</h2>
+
+    <h2><div class="code">PWStrengthMeter(fieldEl, meterEl, options)</div></h2>
+
+    <ul>
+        <li><span class="code">fieldEl {HTMLInput}</span> - The password field whose "onkeyup" event will be monitored.
+
+        <li><span class="code">meterEl {HTMLElement}</span> - The password strength meter element whose className attribute will be updated based on the status ("valid" or "invalid") and range ("weak", "good", or "strong") of the password.</li>
+
+        <li><span class="code">options {Object}</span> - Optional configuration arguments that can be passed in to tailor the functionality of the class.
+
+            <ul>
+                <li><span class="code">onChange {function}</span> - Listener to call whenever the password is changed. Returning <span class="code">false</span> will cancel the setting of classNames on the meterEl. The function will be passed an object with the following attributes:
+    <pre>{
+        valid: < Boolean indicating whether the password passed all of the rules >,
+        range:  < Object of range that the password matched >,
+        invalidRules: < Array of the rules that failed to validate. Empty if valid is true >
+    }</pre></li>
+
+                <li><span class="code">ranges {Object[]}</span> - An array of range objects that define a minimum and maximum number for a range that the password's calculated bits that will be compared against to determine if they fit in the given range. The <span class="code">cls</span> attribute will be applied to the meterEl current password falls between the <span class="code">min</span> and <span class="code">max</span> of a range. The default ranges are:
+    <pre>[
+        { min: Number.NEGATIVE_INFINITY, max: 0, cls: "empty"},
+        { min: 0, max: 56, cls: "weak"},
+        { min: 56, max: 80, cls: "good" },
+        { min: 80, max: Number.POSITIVE_INFINITY, cls: "strong" }
+    ]</pre></li>
+
+                <li><span class="code">rules {Object[]}</span> - An array of rule objects that will be tested against the password.  Each rule object must have a <span class="code">regex</span> attribute that will be tested via <span class="code">regex.test(password)</span> and compared to the <span class="code">result</span> boolean attribute to determine whether the rule has been successfully passed. Default is no rules (ie []). Example of an array of rules:
+    <pre>[
+        {regex: /.{8,}/, result: true },   // length >= 8
+        {regex: /[a-z]/i, result: true },  // Must contain at least one alpha character
+        {regex: /[\W_]/, result: true },   // Must contain one symbol
+        {regex: /^\d/, result: false }     // Cannot start with a number
+    ]</pre></li>
+
+                <li><span class="code">clsValid {String}</span> - Optional class added to meterEl when the password is valid. Default is "valid".</li>
+
+                <li><span class="code">clsInvalid {String}</span> - Optional class added to meterEl when the password is invalid. Default is "invalid".</li>
+            </ul>
+        </li>
+
+    </ul>
 
 
-<h2>REQUIREMENTS</h2>
-<p>
-Create a password strength widget that could be used in multiple forms. The widget should fulfill the following requirements:
-    <ol>
-        <li>Follow best practices for determining password strength.</li>
-        <li>Allow any number of strength ranges (ex. "weak", "good", "excellent", etc...) to be defined for each password field.</li>
-        <li>Be independent of page's HTML structure so the functionality can be used for any number of different login forms.</li>
-        <li>Have no dependency on an external JavaScript library.</li>
-        <li>Allow user to specify password rules that must be passed before a password's strength will be calculated.</li>
+    <h2>Examples</h2>
+
+    <p>
+    For simplicity all of the following examples use <span class="code">&lt;input type="text"&gt;</span> to show the password as it is typed.
+    </p>
+
+    <ol class="examples">
+        <li style="clear: both">Show strength of typed password.
+            <script>
+            window.addEventListener = window.addEventListener ? window.addEventListener : function (type, fn) { window.attachEvent("on"+type, fn); };
+            window.addEventListener("load", function () {
+
+                var fld = document.forms["example1"].elements["pw"],
+                    meter = document.getElementById("meter1");
+
+                new PWStrengthMeter(fld, meter);
+            }, false);
+            </script>
+            <form name="example1">
+                <div class="passwordWrap">
+                    <input type="text" name="pw" class="password" />
+                    <div id="meter1" class="meter invalid">
+                        <span class="msgEmpty">No password</span>
+                        <span class="msgWeak">Weak</span>
+                        <span class="msgGood">Good</span>
+                        <span class="msgStrong">Strong</span>
+
+                        <div class="barWrap">
+                            <div class="bar"></div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </li>
+
+        <li style="clear: both">Password must have a minimum length of 8 characters.
+            <script>
+            window.addEventListener("load", function () {
+
+                var fld = document.forms["example2"].elements["pw"],
+                    meter = document.getElementById("meter2");
+
+                new PWStrengthMeter(fld, meter, {
+                    rules: [
+                        {regex: /.{8,}/, result: true }   // length >= 8
+                    ]
+                });
+            }, false);
+            </script>
+            <form name="example2">
+                <div class="passwordWrap">
+                    <input type="text" name="pw" class="password" />
+                    <div id="meter2" class="meter invalid">
+                        <span class="msgInvalid">Passwords must be at least 8 characters long</span>
+                        <span class="msgWeak">Weak</span>
+                        <span class="msgGood">Good</span>
+                        <span class="msgStrong">Strong</span>
+
+                        <div class="barWrap">
+                            <div class="bar"></div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </li>
+
+        <li style="clear: both">Password must have a minimum length of 8 characters, contain one alpha and one symbol.
+            <script>
+            window.addEventListener("load", function () {
+
+                var fld = document.forms["example3"].elements["pw"],
+                    meter = document.getElementById("meter3");
+
+                new PWStrengthMeter(fld, meter, {
+                    rules: [
+                        {regex: /.{8,}/, result: true },   // length >= 8
+                        {regex: /[a-z]/i, result: true },  // Must contain at least one alpha character
+                        {regex: /[\W_]/, result: true }   // Must contain one symbol
+                    ]
+                });
+            }, false);
+            </script>
+            <form name="example3">
+                <div class="passwordWrap">
+                    <input type="text" name="pw" class="password" />
+                    <div id="meter3" class="meter invalid">
+                        <span class="msgInvalid">Passwords must be at least 8 characters long, contain one alpha and one symbol</span>
+                        <span class="msgWeak">Weak</span>
+                        <span class="msgGood">Good</span>
+                        <span class="msgStrong">Strong</span>
+
+                        <div class="barWrap">
+                            <div class="bar"></div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </li>
+
+
+        <li style="clear: both">Example of onChange.
+            <script>
+            window.addEventListener("load", function () {
+
+                var fld = document.forms["example4"].elements["pw"],
+                    meter = document.getElementById("meter4");
+
+                new PWStrengthMeter(fld, meter, {
+                    rules: [
+                        {regex: /.{8,}/, result: true },   // length >= 8
+                        {regex: /[a-z]/i, result: true },  // Must contain at least one alpha character
+                        {regex: /[\W_]/, result: true }   // Must contain one symbol
+                    ],
+                    onChange: function (data) {
+                        console.log("data=%o", data);
+                    }
+                });
+            }, false);
+            </script>
+            <form name="example4">
+                <div class="passwordWrap">
+                    <input type="text" name="pw" class="password" />
+                    <div id="meter4" class="meter invalid">
+                        <span class="msgInvalid">Passwords must be at least 8 characters long, contain one alpha and one symbol</span>
+                        <span class="msgWeak">Weak</span>
+                        <span class="msgGood">Good</span>
+                        <span class="msgStrong">Strong</span>
+
+                        <div class="barWrap">
+                            <div class="bar"></div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </li>
     </ol>
-</p>
 
-<h2>DISCUSSION</h2>
-<p>
-The definitive research on calculating password strength has been conducted by the National Institute of Standards and Technology (NIST) and documented in the <em>"Electronic Authentication Guideline"</em> (<a href="http://csrc.nist.gov/publications/nistpubs/800-63-1/SP-800-63-1.pdf">http://csrc.nist.gov/publications/nistpubs/800-63-1/SP-800-63-1.pdf</a>). The NIST's recommendations for password strength calculations are located in Appendix A. The NIST defines a password's strength in terms of "entropy". Entropy is simply how random the characters in the password are. A password composed of more random characters will have a higher entropy value. For requirement #1 I used the entropy calculations defined in the Electronic Authentication Guideline for determining a password's entropy.
-</p>
-
-<p>
- The Electronic Authentication Guideline provides a detailed description of how to calculate entropy, but for the sake of brevity, here is a simplified explanation on how it works:
-
-    <ol>
-        <li>Determine how many character sets the password contains. For example <em>"test1234-="</em> contains three character sets: lowercase characters (<em>"test"</em>), numeric (<em>"1234"</em>), and special characters (<em>"-="</em>).</li>
-        <li>Calculate initial entropy value based on size of the character sets the password is in, the number of character sets the password is in, and the length of password.</li>
-        <li>Add bonus entropy for passwords that pass a dictionary test.</li>
-    </ol>
-</p>
-
-<p>
-How much entropy does a "strong" or "weak" password have? That answer is subjective. For that reason, and to fulfill requirement #2, the password strength meter accepts an optional range of entropy values to define what constitutes weak or strong passwords. If no range is specified, a default is provided.
-</p>
-
-<p>
-To fulfill requirement #3, to make the password strength meter flexible enough to be used on any form, the password strength meter does not impose an HTML structure. Because of this, the API will need three pieces of information:
-    <ol>
-        <li>A reference to the <span class="code">&lt;input&gt;</span> field used for the password.</li>
-        <li>A reference to the meter element (ex. a <span class="code">&lt;div&gt;</span> that will expand and collapse as the password strength increases and decreases).</li>
-        <li>A CSS classname for each entropy range. The classname will be added to the meter element whenever the entropy of the password matches the given range.</li>
-    </ol>
-</p>
-
-<p>
-Finally, there are typically rules that must be passed before the password's strength becomes relevant. For example, the user may be required to have a password that is 8 or more characters in length before the strength meter is shown. To fulfill requirement #5 the password strength meter accepts a collection of regular expressions that will be tested against the current password to determine whether it is valid. The meter element will be given a classname of <em>"valid"</em> when all of the rules pass and a classname of <em>"invalid"</em> when any of the rules fail.
-</p>
-
-<h2>API</h2>
-
-<h2><div class="code">PWStrengthMeter(fieldEl, meterEl, options)</div></h2>
-
-<ul>
-    <li><span class="code">fieldEl {HTMLInput}</span> - The password field whose "onkeyup" event will be monitored.
-
-    <li><span class="code">meterEl {HTMLElement}</span> - The password strength meter element whose className attribute will be updated based on the status ("valid" or "invalid") and range ("weak", "good", or "strong") of the password.</li>
-
-    <li><span class="code">options {Object}</span> - Optional configuration arguments that can be passed in to tailor the functionality of the class.
-
-        <ul>
-            <li><span class="code">onChange {function}</span> - Listener to call whenever the password is changed. Returning <span class="code">false</span> will cancel the setting of classNames on the meterEl. The function will be passed an object with the following attributes:
-<pre>{
-    valid: < Boolean indicating whether the password passed all of the rules >,
-    range:  < Object of range that the password matched >,
-    invalidRules: < Array of the rules that failed to validate. Empty if valid is true >
-}</pre></li>
-
-            <li><span class="code">ranges {Object[]}</span> - An array of range objects that define a minimum and maximum number for a range that the password's calculated bits that will be compared against to determine if they fit in the given range. The <span class="code">cls</span> attribute will be applied to the meterEl current password falls between the <span class="code">min</span> and <span class="code">max</span> of a range. The default ranges are:
-<pre>[
-    { min: Number.NEGATIVE_INFINITY, max: 0, cls: "empty"},
-    { min: 0, max: 56, cls: "weak"},
-    { min: 56, max: 80, cls: "good" },
-    { min: 80, max: Number.POSITIVE_INFINITY, cls: "strong" }
-]</pre></li>
-
-            <li><span class="code">rules {Object[]}</span> - An array of rule objects that will be tested against the password.  Each rule object must have a <span class="code">regex</span> attribute that will be tested via <span class="code">regex.test(password)</span> and compared to the <span class="code">result</span> boolean attribute to determine whether the rule has been successfully passed. Default is no rules (ie []). Example of an array of rules:
-<pre>[
-    {regex: /.{8,}/, result: true },   // length >= 8
-    {regex: /[a-z]/i, result: true },  // Must contain at least one alpha character
-    {regex: /[\W_]/, result: true },   // Must contain one symbol
-    {regex: /^\d/, result: false }     // Cannot start with a number
-]</pre></li>
-
-            <li><span class="code">clsValid {String}</span> - Optional class added to meterEl when the password is valid. Default is "valid".</li>
-
-            <li><span class="code">clsInvalid {String}</span> - Optional class added to meterEl when the password is invalid. Default is "invalid".</li>
-        </ul>
-    </li>
-
-</ul>
-
-
-<h2>Examples</h2>
-
-<p>
-For simplicity all of the following examples use <span class="code">&lt;input type="text"&gt;</span> to show the password as it is typed.
-</p>
-
-<ol class="examples">
-    <li style="clear: both">Show strength of typed password.
-        <script>
-        window.addEventListener = window.addEventListener ? window.addEventListener : function (type, fn) { window.attachEvent("on"+type, fn); };
-        window.addEventListener("load", function () {
-
-            var fld = document.forms["example1"].elements["pw"],
-                meter = document.getElementById("meter1");
-
-            new PWStrengthMeter(fld, meter);
-        }, false);
-        </script>
-        <form name="example1">
-            <div class="passwordWrap">
-                <input type="text" name="pw" class="password" />
-                <div id="meter1" class="meter invalid">
-                    <span class="msgEmpty">No password</span>
-                    <span class="msgWeak">Weak</span>
-                    <span class="msgGood">Good</span>
-                    <span class="msgStrong">Strong</span>
-
-                    <div class="barWrap">
-                        <div class="bar"></div>
-                    </div>
-                </div>
-            </div>
-        </form>
-    </li>
-
-    <li style="clear: both">Password must have a minimum length of 8 characters.
-        <script>
-        window.addEventListener("load", function () {
-
-            var fld = document.forms["example2"].elements["pw"],
-                meter = document.getElementById("meter2");
-
-            new PWStrengthMeter(fld, meter, {
-                rules: [
-                    {regex: /.{8,}/, result: true }   // length >= 8
-                ]
-            });
-        }, false);
-        </script>
-        <form name="example2">
-            <div class="passwordWrap">
-                <input type="text" name="pw" class="password" />
-                <div id="meter2" class="meter invalid">
-                    <span class="msgInvalid">Passwords must be at least 8 characters long</span>
-                    <span class="msgWeak">Weak</span>
-                    <span class="msgGood">Good</span>
-                    <span class="msgStrong">Strong</span>
-
-                    <div class="barWrap">
-                        <div class="bar"></div>
-                    </div>
-                </div>
-            </div>
-        </form>
-    </li>
-
-    <li style="clear: both">Password must have a minimum length of 8 characters, contain one alpha and one symbol.
-        <script>
-        window.addEventListener("load", function () {
-
-            var fld = document.forms["example3"].elements["pw"],
-                meter = document.getElementById("meter3");
-
-            new PWStrengthMeter(fld, meter, {
-                rules: [
-                    {regex: /.{8,}/, result: true },   // length >= 8
-                    {regex: /[a-z]/i, result: true },  // Must contain at least one alpha character
-                    {regex: /[\W_]/, result: true }   // Must contain one symbol
-                ]
-            });
-        }, false);
-        </script>
-        <form name="example3">
-            <div class="passwordWrap">
-                <input type="text" name="pw" class="password" />
-                <div id="meter3" class="meter invalid">
-                    <span class="msgInvalid">Passwords must be at least 8 characters long, contain one alpha and one symbol</span>
-                    <span class="msgWeak">Weak</span>
-                    <span class="msgGood">Good</span>
-                    <span class="msgStrong">Strong</span>
-
-                    <div class="barWrap">
-                        <div class="bar"></div>
-                    </div>
-                </div>
-            </div>
-        </form>
-    </li>
-
-
-    <li style="clear: both">Example of onChange.
-        <script>
-        window.addEventListener("load", function () {
-
-            var fld = document.forms["example4"].elements["pw"],
-                meter = document.getElementById("meter4");
-
-            new PWStrengthMeter(fld, meter, {
-                rules: [
-                    {regex: /.{8,}/, result: true },   // length >= 8
-                    {regex: /[a-z]/i, result: true },  // Must contain at least one alpha character
-                    {regex: /[\W_]/, result: true }   // Must contain one symbol
-                ],
-                onChange: function (data) {
-                    console.log("data=%o", data);
-                }
-            });
-        }, false);
-        </script>
-        <form name="example4">
-            <div class="passwordWrap">
-                <input type="text" name="pw" class="password" />
-                <div id="meter4" class="meter invalid">
-                    <span class="msgInvalid">Passwords must be at least 8 characters long, contain one alpha and one symbol</span>
-                    <span class="msgWeak">Weak</span>
-                    <span class="msgGood">Good</span>
-                    <span class="msgStrong">Strong</span>
-
-                    <div class="barWrap">
-                        <div class="bar"></div>
-                    </div>
-                </div>
-            </div>
-        </form>
-    </li>
-
-
-</ol>
-
-    </body>
+</div> <!-- eo main -->
+</body>
 </html>
